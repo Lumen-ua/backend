@@ -1,0 +1,7 @@
+# Simple client Dockerfile placeholder
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json vite.config.mjs ./
+COPY src ./src
+RUN npm install
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
