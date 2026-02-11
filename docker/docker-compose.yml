@@ -8,6 +8,8 @@ services:
       MYSQL_DATABASE: lumen_db
     ports:
       - "3307:3306"
+    volumes:
+      - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
   server:
     build:
@@ -17,14 +19,6 @@ services:
       - mysql
     environment:
       ASPNETCORE_URLS: http://+:5000
+      ASPNETCORE_ENVIRONMENT: Development
     ports:
       - "5000:5000"
-
-  client:
-    build:
-      context: ../client
-      dockerfile: ../docker/Dockerfile.client
-    ports:
-      - "5173:5173"
-    depends_on:
-      - server

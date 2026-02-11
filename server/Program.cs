@@ -1,14 +1,54 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Server.Data;
+using Server.Middlewares;
+using Server.Options;
+using Server.Services;
+using Server.Helpers; 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Lumen API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter JWT token like: Bearer {your_token}"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DefaultCors", policy =>
+    {
+        policy.AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowAnyOrigin();
+    });
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
@@ -16,7 +56,52 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         new MySqlServerVersion(new Version(8, 0, 34))
     ));
 
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+
+var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>();
+if (jwtOptions is null)
+    throw new Exception("Jwt section is missing in configuration (appsettings.json / env).");
+
+if (string.IsNullOrWhiteSpace(jwtOptions.Secret))
+    throw new Exception("Jwt:Secret is missing in configuration (appsettings.json / env).");
+
+if (string.IsNullOrWhiteSpace(jwtOptions.Issuer))
+    jwtOptions.Issuer = "Lumen";
+
+if (string.IsNullOrWhiteSpace(jwtOptions.Audience))
+    jwtOptions.Audience = "LumenClient";
+
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret));
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = key,
+
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30)
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddSingleton<JwtTokenService>(); 
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<UserService>();
+
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
@@ -25,7 +110,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseCors("DefaultCors");
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

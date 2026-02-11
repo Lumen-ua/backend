@@ -7,3 +7,6 @@ CREATE TABLE IF NOT EXISTS Users (
   Name VARCHAR(255) NOT NULL,
   PasswordHash VARCHAR(255) NOT NULL
 );
+
+-- Optional (recommended): ensure emails are unique
+-- CREATE UNIQUE INDEX idx_users_email ON Users (Email);
