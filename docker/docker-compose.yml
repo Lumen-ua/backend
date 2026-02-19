@@ -1,24 +1,37 @@
-version: '3.9'
-
 services:
   mysql:
     image: mysql:8
+    container_name: lumen-mysql
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: secret
       MYSQL_DATABASE: lumen_db
     ports:
       - "3307:3306"
     volumes:
+      - mysql_data:/var/lib/mysql
       - ../database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -psecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   server:
+    container_name: lumen-server
     build:
       context: ..
       dockerfile: docker/Dockerfile.server
+    restart: always
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       ASPNETCORE_URLS: http://+:5000
       ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=lumen_db;User=root;Password=secret;"
     ports:
       - "5000:5000"
+
+volumes:
+  mysql_data:
