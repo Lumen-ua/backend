@@ -99,6 +99,10 @@ builder.Services.AddSingleton<JwtTokenService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 
+builder.Services.AddScoped<PaymentService>();
+builder.Services.AddScoped<DashboardService>();
+builder.Services.AddHostedService<PaymentApprovalWorker>();
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
