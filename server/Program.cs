@@ -7,7 +7,7 @@ using Server.Data;
 using Server.Middlewares;
 using Server.Options;
 using Server.Services;
-using Server.Helpers; 
+using Server.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -106,7 +106,7 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddSingleton<JwtTokenService>(); 
+builder.Services.AddSingleton<JwtTokenService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 
@@ -115,6 +115,7 @@ builder.Services.AddScoped<DashboardService>();
 builder.Services.AddHostedService<PaymentApprovalWorker>();
 
 builder.Services.AddScoped<RepairsContentService>();
+builder.Services.AddScoped<BudgetContentService>();
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

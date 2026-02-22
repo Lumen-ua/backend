@@ -10,7 +10,9 @@ namespace Server.Data
         public DbSet<User> Users => Set<User>();
         public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<Template> Templates => Set<Template>();
-
         public DbSet<RepairsContent> RepairsContent => Set<RepairsContent>();
+
+        // ✅ ДОДАНО
+        public DbSet<BudgetContent> BudgetContent => Set<BudgetContent>();
     }
 }

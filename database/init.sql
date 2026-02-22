@@ -64,3 +64,18 @@ CREATE TABLE IF NOT EXISTS RepairsContent (
 );
 -- Optional (recommended): ensure emails are unique
 -- CREATE UNIQUE INDEX idx_users_email ON Users (Email);
+
+
+CREATE TABLE IF NOT EXISTS BudgetContent (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL,
+
+    CompletedSimulationsJson TEXT NOT NULL,
+
+    CONSTRAINT FK_BudgetContent_Users
+        FOREIGN KEY (UserId)
+        REFERENCES Users(Id)
+        ON DELETE CASCADE,
+
+    UNIQUE KEY UX_BudgetContent_UserId (UserId)
+);
