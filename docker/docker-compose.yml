@@ -33,5 +33,8 @@ services:
     ports:
       - "5000:5000"
 
+    volumes:
+       - ../server/wwwroot/uploads:/app/wwwroot/uploads
+
 volumes:
   mysql_data:

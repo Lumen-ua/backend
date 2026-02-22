@@ -5,6 +5,7 @@ namespace Server.DTOs.Auth
         public int Id { get; set; }
         public string Email { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+        public string? AvatarUrl { get; set; }
         public string Token { get; set; } = string.Empty;
     }
 }

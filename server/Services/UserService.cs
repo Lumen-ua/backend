@@ -43,7 +43,7 @@ namespace Server.Services
 
             await _db.SaveChangesAsync();
 
-            return new UserResponse { Id = user.Id, Email = user.Email, Name = user.Name };
+            return new UserResponse { Id = user.Id, Email = user.Email, Name = user.Name, AvatarUrl = user.AvatarUrl};
         }
     }
 }
