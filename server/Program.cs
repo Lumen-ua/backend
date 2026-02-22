@@ -114,6 +114,7 @@ builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddHostedService<PaymentApprovalWorker>();
 
+builder.Services.AddScoped<RepairsContentService>();
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

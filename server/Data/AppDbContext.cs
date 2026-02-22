@@ -11,5 +11,6 @@ namespace Server.Data
         public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<Template> Templates => Set<Template>();
 
+        public DbSet<RepairsContent> RepairsContent => Set<RepairsContent>();
     }
 }
