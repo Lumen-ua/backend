@@ -28,19 +28,43 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Pay(CreatePaymentRequest req)
+        public async Task<IActionResult> Pay([FromBody] CreatePaymentRequest req)
         {
             var userId = _auth.GetUserIdFromClaims(User);
             var payment = await _service.CreateAsync(userId, req);
             return Ok(payment);
         }
-
+ 
         [HttpPost("{id}/refund")]
         public async Task<IActionResult> Refund(int id)
         {
             var userId = _auth.GetUserIdFromClaims(User);
             await _service.RefundAsync(userId, id);
-            return Ok();
+            return Ok(new { success = true });
+        }
+
+        [HttpGet("templates")]
+        public async Task<IActionResult> GetTemplates()
+        {
+            var userId = _auth.GetUserIdFromClaims(User);
+            var templates = await _service.GetTemplatesAsync(userId);
+            return Ok(templates);
+        }
+
+        [HttpPost("templates")]
+        public async Task<IActionResult> CreateTemplate([FromBody] CreateTemplateRequest req)
+        {
+            var userId = _auth.GetUserIdFromClaims(User);
+            var template = await _service.CreateTemplateAsync(userId, req);
+            return Ok(template);
+        }
+
+        [HttpDelete("templates/{id}")]
+        public async Task<IActionResult> DeleteTemplate(int id)
+        {
+            var userId = _auth.GetUserIdFromClaims(User);
+            await _service.DeleteTemplateAsync(userId, id);
+            return Ok(new { success = true });
         }
     }
 }

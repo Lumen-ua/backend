@@ -7,7 +7,9 @@ using Server.Data;
 using Server.Middlewares;
 using Server.Options;
 using Server.Services;
-using Server.Helpers;
+using Server.Helpers; 
+using System.ComponentModel.DataAnnotations;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -116,6 +118,7 @@ builder.Services.AddHostedService<PaymentApprovalWorker>();
 
 builder.Services.AddScoped<RepairsContentService>();
 builder.Services.AddScoped<BudgetContentService>();
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();

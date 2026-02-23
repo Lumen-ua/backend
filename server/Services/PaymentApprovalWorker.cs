@@ -22,31 +22,44 @@ namespace Server.Services
                     using var scope = _scopeFactory.CreateScope();
                     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+                    var now = DateTime.UtcNow;
+
                     var payments = await db.Payments
-                        .Where(p => p.Status == PaymentStatus.Processing &&
-                                    p.CreatedAt <= DateTime.UtcNow.AddSeconds(-30))
+                        .Where(p => p.Status == PaymentStatus.Processing)
                         .ToListAsync(stoppingToken);
 
-                    var userIds = payments.Select(p => p.UserId).Distinct().ToList();
-
-                    var users = await db.Users
-                        .Where(u => userIds.Contains(u.Id))
-                        .ToDictionaryAsync(u => u.Id, stoppingToken);
-
-                    foreach (var p in payments)
+                    if (payments.Count > 0)
                     {
-                        p.Status = PaymentStatus.Approved;
+                        var userIds = payments
+                            .Select(p => p.UserId)
+                            .Distinct()
+                            .ToList();
 
-                        if (users.TryGetValue(p.UserId, out var user))
-                            user.Experience += 1;
+                        var users = await db.Users
+                            .Where(u => userIds.Contains(u.Id))
+                            .ToDictionaryAsync(u => u.Id, stoppingToken);
+
+                        foreach (var payment in payments)
+                        {
+                            var secondsPassed = (now - payment.CreatedAt).TotalSeconds;
+
+                            if (secondsPassed > 30)
+                            {
+                                payment.Status = PaymentStatus.Approved;
+
+                                if (users.TryGetValue(payment.UserId, out var user))
+                                {
+                                    user.Experience += 1;
+                                }
+                            }
+                        }
+
+                        await db.SaveChangesAsync(stoppingToken);
                     }
-
-                    await db.SaveChangesAsync(stoppingToken);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"PaymentApprovalWorker error: {ex.Message}");
-                    await Task.Delay(5000, stoppingToken); 
                 }
 
                 await Task.Delay(5000, stoppingToken);
