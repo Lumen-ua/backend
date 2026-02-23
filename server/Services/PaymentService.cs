@@ -53,19 +53,75 @@ namespace Server.Services
             var payment = await _db.Payments
                 .FirstOrDefaultAsync(p => p.Id == paymentId && p.UserId == userId);
 
-            if (payment == null) throw new ApiException(404, "Payment not found");
+            if (payment == null)
+                throw new ApiException(404, "Payment not found");
+
+            var secondsPassed = (DateTime.UtcNow - payment.CreatedAt).TotalSeconds;
+
+            if (secondsPassed > 30)
+                throw new ApiException(400, "Refund window expired");
 
             if (payment.Status != PaymentStatus.Processing)
                 throw new ApiException(400, "Cannot refund");
-
-            if (payment.CreatedAt <= DateTime.UtcNow.AddSeconds(-30))
-                throw new ApiException(400, "Refund window expired");
 
             var user = await _db.Users.FirstAsync(u => u.Id == userId);
 
             user.Balance += payment.Amount;
             payment.Status = PaymentStatus.Refunded;
 
+            await _db.SaveChangesAsync();
+        }
+        public async Task<List<TemplateResponse>> GetTemplatesAsync(int userId)
+        {
+            return await _db.Templates
+                .Where(t => t.UserId == userId)
+                .Select(t => new TemplateResponse
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Service = t.Service,
+                    Type = t.Type,
+                    Value = t.Value
+                })
+                .ToListAsync();
+        }
+
+        public async Task<TemplateResponse> CreateTemplateAsync(int userId, CreateTemplateRequest req)
+        {
+            if (string.IsNullOrWhiteSpace(req.Name))
+                throw new ApiException(400, "Template name required");
+
+            var template = new Template
+            {
+                Name = req.Name,
+                Service = req.Service,
+                Type = req.Type,
+                Value = req.Value,
+                UserId = userId
+            };
+
+            _db.Templates.Add(template);
+            await _db.SaveChangesAsync();
+
+            return new TemplateResponse
+            {
+                Id = template.Id,
+                Name = template.Name,
+                Service = template.Service,
+                Type = template.Type,
+                Value = template.Value
+            };
+        }
+        
+        public async Task DeleteTemplateAsync(int userId, int id)
+        {
+            var template = await _db.Templates
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+
+            if (template == null)
+                throw new ApiException(404, "Template not found");
+
+            _db.Templates.Remove(template);
             await _db.SaveChangesAsync();
         }
 

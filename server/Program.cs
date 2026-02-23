@@ -8,6 +8,7 @@ using Server.Middlewares;
 using Server.Options;
 using Server.Services;
 using Server.Helpers; 
+using System.ComponentModel.DataAnnotations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -114,6 +115,7 @@ builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<DashboardService>();
 builder.Services.AddHostedService<PaymentApprovalWorker>();
 
+builder.Services.AddScoped<RepairsContentService>();
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -123,6 +125,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+app.UseStaticFiles();
 
 app.UseRouting();
 app.UseCors("DefaultCors");

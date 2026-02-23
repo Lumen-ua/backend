@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System;
 namespace Server.Models
 {
     public class Payment
