@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS Users (
   Email VARCHAR(255) NOT NULL,
   Name VARCHAR(255) NOT NULL,
   PasswordHash VARCHAR(255) NOT NULL,
+  AvatarUrl VARCHAR(512) NULL,
   Balance DECIMAL(18,2) NOT NULL DEFAULT 1000.00,
   Experience INT NOT NULL DEFAULT 0
 );
@@ -45,5 +46,36 @@ CREATE TABLE IF NOT EXISTS Templates (
         REFERENCES Users(Id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS RepairsContent (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL,
+    
+    CompletedTopicsJson TEXT NOT NULL,
+    MaintenanceStateJson TEXT NOT NULL,
+    EmergencyFormJson TEXT NOT NULL,
+
+    CONSTRAINT FK_RepairsContent_Users
+        FOREIGN KEY (UserId)
+        REFERENCES Users(Id)
+        ON DELETE CASCADE,
+        
+    UNIQUE KEY UX_RepairsContent_UserId (UserId)
+);
 -- Optional (recommended): ensure emails are unique
 -- CREATE UNIQUE INDEX idx_users_email ON Users (Email);
+
+
+CREATE TABLE IF NOT EXISTS BudgetContent (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL,
+
+    CompletedSimulationsJson TEXT NOT NULL,
+
+    CONSTRAINT FK_BudgetContent_Users
+        FOREIGN KEY (UserId)
+        REFERENCES Users(Id)
+        ON DELETE CASCADE,
+
+    UNIQUE KEY UX_BudgetContent_UserId (UserId)
+);

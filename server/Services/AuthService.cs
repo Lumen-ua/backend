@@ -37,7 +37,8 @@ namespace Server.Services
             var user = new User
             {
                 Email = email,
-                Name = req.Name.Trim()
+                Name = req.Name.Trim(),
+                AvatarUrl = null
             };
 
             user.PasswordHash = _hasher.HashPassword(user, req.Password);
@@ -46,7 +47,7 @@ namespace Server.Services
             await _db.SaveChangesAsync();
 
             string token = _jwt.CreateToken(user);
-            return new AuthResponse { Id = user.Id, Email = user.Email, Name = user.Name, Token = token };
+            return new AuthResponse { Id = user.Id, Email = user.Email, Name = user.Name, AvatarUrl = user.AvatarUrl, Token = token };
         }
 
         public async Task<AuthResponse> LoginAsync(LoginRequest req)
@@ -64,7 +65,7 @@ namespace Server.Services
                 throw new ApiException(401, "Invalid email or password");
 
             string token = _jwt.CreateToken(user);
-            return new AuthResponse { Id = user.Id, Email = user.Email, Name = user.Name, Token = token };
+            return new AuthResponse { Id = user.Id, Email = user.Email, Name = user.Name, AvatarUrl = user.AvatarUrl, Token = token };
         }
 
         public async Task<User> GetByIdAsync(int id)

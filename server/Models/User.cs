@@ -10,6 +10,8 @@ namespace Server.Models
 
         public string PasswordHash { get; set; } = string.Empty;
 
+        public string? AvatarUrl { get; set; }
+
         public decimal Balance { get; set; } = 1000;
         
         public int Experience { get; set; } = 0;

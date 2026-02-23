@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Server.DTOs.Auth;
@@ -51,7 +52,8 @@ namespace Server.Controllers
             {
                 id = user.Id,
                 email = user.Email,
-                name = user.Name
+                name = user.Name,
+                avatarUrl = user.AvatarUrl
             });
         }
     }
