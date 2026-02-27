@@ -24,23 +24,28 @@ namespace Server.Services
             if (user == null)
                 throw new ApiException(404, "User not found");
 
-        foreach (var payment in user.Payments)
-        {
-            if (payment.Status == PaymentStatus.Processing &&
-                (DateTime.UtcNow - payment.CreatedAt).TotalSeconds > 30)
+            bool hasChanges = false;
+            foreach (var payment in user.Payments)
             {
-                payment.Status = PaymentStatus.Approved;
-                user.Experience += 1;
+                if (payment.Status == PaymentStatus.Processing &&
+                    (DateTime.UtcNow - payment.CreatedAt).TotalSeconds > 30)
+                {
+                    payment.Status = PaymentStatus.Approved;
+                    user.Experience += 1; 
+                    hasChanges = true;
+                }
             }
-        }
 
-        await _db.SaveChangesAsync();
+            if (hasChanges)
+            {
+                await _db.SaveChangesAsync();
+            }
 
-            var approvedPayments = user.Payments
+            var approvedPaymentsCount = user.Payments
+                .Count(p => p.Status == PaymentStatus.Approved);
+
+            var stats = user.Payments
                 .Where(p => p.Status == PaymentStatus.Approved)
-                .ToList();
-
-            var stats = approvedPayments
                 .GroupBy(p => p.Service)
                 .Select(g => new ServiceStat
                 {
@@ -52,8 +57,8 @@ namespace Server.Services
             return new DashboardResponse
             {
                 Balance = user.Balance,
-                ApprovedCount = approvedPayments.Count,
-                Level = LevelHelper.GetLevel(user.Experience),
+                ApprovedCount = approvedPaymentsCount, 
+                Level = LevelHelper.GetLevel(user.Experience), 
                 Stats = stats
             };
         }
