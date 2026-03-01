@@ -80,3 +80,33 @@ CREATE TABLE IF NOT EXISTS BudgetContent (
 
     UNIQUE KEY UX_BudgetContent_UserId (UserId)
 );
+
+
+CREATE TABLE IF NOT EXISTS LegalContent (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL,
+
+    CompletedSimulationsJson TEXT NOT NULL,
+
+    CONSTRAINT FK_LegalContent_Users
+        FOREIGN KEY (UserId)
+        REFERENCES Users(Id)
+        ON DELETE CASCADE,
+
+    UNIQUE KEY UX_LegalContent_UserId (UserId)
+);
+
+CREATE TABLE IF NOT EXISTS EnergyContent (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    UserId INT NOT NULL,
+
+    CompletedTopicsJson TEXT NOT NULL,
+
+    CONSTRAINT FK_EnergyContent_Users
+        FOREIGN KEY (UserId)
+        REFERENCES Users(Id)
+        ON DELETE CASCADE,
+
+    UNIQUE KEY UX_EnergyContent_UserId (UserId)
+);
+

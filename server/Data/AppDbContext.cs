@@ -12,7 +12,8 @@ namespace Server.Data
         public DbSet<Template> Templates => Set<Template>();
         public DbSet<RepairsContent> RepairsContent => Set<RepairsContent>();
 
-        // ✅ ДОДАНО
         public DbSet<BudgetContent> BudgetContent => Set<BudgetContent>();
+        public DbSet<LegalContent> LegalContent => Set<LegalContent>();
+        public DbSet<EnergyContent> EnergyContent => Set<EnergyContent>();
     }
 }

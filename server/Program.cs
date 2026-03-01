@@ -117,6 +117,8 @@ builder.Services.AddScoped<DashboardService>();
 
 builder.Services.AddScoped<RepairsContentService>();
 builder.Services.AddScoped<BudgetContentService>();
+builder.Services.AddScoped<LegalContentService>();
+builder.Services.AddScoped<EnergyContentService>();
 
 var app = builder.Build();
 
