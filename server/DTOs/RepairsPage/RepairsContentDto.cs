@@ -5,6 +5,7 @@ namespace Server.DTOs.RepairsPage
         public string CompletedTopicsJson { get; set; } = "[]";
         public string MaintenanceStateJson { get; set; } = "{}";
         public string EmergencyFormJson { get; set; } = "{}";
+        public string CompletedAchievementsJson { get; set; } = "[]";
     }
 
     public class UpdateProgressDto { public string CompletedTopicsJson { get; set; } = "[]"; }

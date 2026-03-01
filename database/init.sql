@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS RepairsContent (
     CompletedTopicsJson TEXT NOT NULL,
     MaintenanceStateJson TEXT NOT NULL,
     EmergencyFormJson TEXT NOT NULL,
+    CompletedAchievementsJson TEXT NOT NULL,
 
     CONSTRAINT FK_RepairsContent_Users
         FOREIGN KEY (UserId)

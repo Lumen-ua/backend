@@ -58,5 +58,13 @@ namespace Server.Controllers
             await _contentService.UpdateEmergencyAsync(userId, dto);
             return Ok();
         }
+
+        [HttpPost("achievement")]
+        public async Task<ActionResult<RepairsContentDto>> AddAchievement([FromBody] CompletedAchievementsDto dto)
+        {
+            var userId = _authService.GetUserIdFromClaims(User);
+            var updated = await _contentService.AddAchievementAsync(userId, dto.Key);
+            return Ok(updated);
+        }
     }
 }

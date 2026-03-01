@@ -114,7 +114,6 @@ builder.Services.AddScoped<UserService>();
 
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<DashboardService>();
-builder.Services.AddHostedService<PaymentApprovalWorker>();
 
 builder.Services.AddScoped<RepairsContentService>();
 builder.Services.AddScoped<BudgetContentService>();

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Server.Data;
 using Server.DTOs.RepairsPage;
@@ -26,7 +27,8 @@ namespace Server.Services
             {
                 CompletedTopicsJson = content.CompletedTopicsJson,
                 MaintenanceStateJson = content.MaintenanceStateJson,
-                EmergencyFormJson = content.EmergencyFormJson
+                EmergencyFormJson = content.EmergencyFormJson,
+                CompletedAchievementsJson = content.CompletedAchievementsJson
             };
         }
 
@@ -52,7 +54,7 @@ namespace Server.Services
         }
 
         public async Task<RepairsContent> GetOrCreateContentAsync(int userId)
-{
+        {
             var content = await _context.RepairsContent
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
@@ -63,13 +65,49 @@ namespace Server.Services
                     UserId = userId,
                     CompletedTopicsJson = "[]",
                     MaintenanceStateJson = "{}",
-                    EmergencyFormJson = "{}"
+                    EmergencyFormJson = "{}",
+                    CompletedAchievementsJson = "[]"
                 };
                 await _context.RepairsContent.AddAsync(content);
                 await _context.SaveChangesAsync();
             }
 
             return content;
+        }
+
+        public async Task<RepairsContentDto> AddAchievementAsync(int userId, string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException("Achievement key is required");
+
+            var content = await GetOrCreateContentAsync(userId);
+
+            List<string> keys;
+
+            try
+            {
+                keys = JsonSerializer.Deserialize<List<string>>(content.CompletedAchievementsJson)
+                    ?? new List<string>();
+            }
+            catch
+            {
+                keys = new List<string>();
+            }
+
+            if (!keys.Contains(key))
+            {
+                keys.Add(key);
+                content.CompletedAchievementsJson = JsonSerializer.Serialize(keys);
+                await _context.SaveChangesAsync();
+            }
+
+            return new RepairsContentDto
+            {
+                CompletedTopicsJson = content.CompletedTopicsJson,
+                MaintenanceStateJson = content.MaintenanceStateJson,
+                EmergencyFormJson = content.EmergencyFormJson,
+                CompletedAchievementsJson = content.CompletedAchievementsJson
+            };
         }
     }
 }

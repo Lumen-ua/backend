@@ -7,7 +7,7 @@
         public string CompletedTopicsJson { get; set; } = "[]";
         public string MaintenanceStateJson { get; set; } = "{}";
         public string EmergencyFormJson { get; set; } = "{}";
-
+        public string CompletedAchievementsJson { get; set; } = "[]";
         public User User { get; set; } = null!;
     }
 }
